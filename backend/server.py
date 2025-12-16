@@ -2197,6 +2197,19 @@ async def get_relatorio_lucro_mensal(
     custo_produtos_vendidos = 0
     vendas_por_metodo = {}
     
+    # Batch fetch all product IDs to avoid N+1 query
+    produto_ids = set()
+    for venda in vendas:
+        for item in venda.get("items", []):
+            produto_ids.add(item.get("produto_id"))
+    
+    # Fetch all products in one query
+    produtos_list = await db.produtos.find(
+        {"id": {"$in": list(produto_ids)}},
+        {"_id": 0, "id": 1, "preco_custo": 1}
+    ).to_list(10000)
+    produtos_map = {p["id"]: p for p in produtos_list}
+    
     for venda in vendas:
         valor_venda = venda.get("total", 0)
         total_vendas += valor_venda
@@ -2204,9 +2217,9 @@ async def get_relatorio_lucro_mensal(
         metodo = venda.get("metodo_pagamento", "outros")
         vendas_por_metodo[metodo] = vendas_por_metodo.get(metodo, 0) + valor_venda
         
-        # Calcular custo dos produtos vendidos
+        # Calcular custo dos produtos vendidos (usando cache)
         for item in venda.get("items", []):
-            produto = await db.produtos.find_one({"id": item.get("produto_id")})
+            produto = produtos_map.get(item.get("produto_id"))
             if produto:
                 custo_unitario = produto.get("preco_custo", 0)
                 quantidade = item.get("quantidade", 0)
