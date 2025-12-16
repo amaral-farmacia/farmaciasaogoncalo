@@ -922,14 +922,22 @@ async def get_vendas(current_user: UserBase = Depends(get_current_user)):
 # Fiado routes
 @api_router.get("/fiados")
 async def get_fiados(current_user: UserBase = Depends(get_current_user)):
-    fiados = await db.fiados.find().to_list(1000)
+    fiados = await db.fiados.find({}, {"_id": 0}).to_list(1000)
+    
+    # Batch fetch all clientes to avoid N+1 query
+    cliente_ids = list(set(fiado["cliente_id"] for fiado in fiados))
+    clientes_list = await db.clientes.find(
+        {"id": {"$in": cliente_ids}, "unidade_id": current_user.unidade_id},
+        {"_id": 0, "id": 1, "nome": 1, "unidade_id": 1}
+    ).to_list(1000)
+    clientes_map = {c["id"]: c for c in clientes_list}
+    
     result = []
     for fiado in fiados:
-        cliente = await db.clientes.find_one({"id": fiado["cliente_id"]})
-        if cliente and cliente["unidade_id"] == current_user.unidade_id:
-            # Convert ObjectId to string and clean data
+        cliente = clientes_map.get(fiado["cliente_id"])
+        if cliente:
             fiado_clean = {
-                "id": fiado.get("id", str(fiado.get("_id", ""))),
+                "id": fiado.get("id", ""),
                 "cliente_id": fiado["cliente_id"],
                 "venda_id": fiado["venda_id"],
                 "valor": float(fiado["valor"]),
