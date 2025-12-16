@@ -1976,17 +1976,33 @@ async def get_transferencias(current_user: UserBase = Depends(get_current_user))
             {"unidade_destino_id": current_user.unidade_id}
         ]
     }
-    transferencias = await db.transferencias.find(filtro).to_list(1000)
-    result = []
+    transferencias = await db.transferencias.find(filtro, {"_id": 0}).to_list(1000)
     
+    # Batch fetch all produtos and unidades to avoid N+1 queries
+    produto_ids = list(set(t["produto_id"] for t in transferencias))
+    unidade_ids = list(set(
+        [t["unidade_origem_id"] for t in transferencias] + 
+        [t["unidade_destino_id"] for t in transferencias]
+    ))
+    
+    produtos_list = await db.produtos.find(
+        {"id": {"$in": produto_ids}}, {"_id": 0, "id": 1, "nome": 1}
+    ).to_list(1000)
+    produtos_map = {p["id"]: p for p in produtos_list}
+    
+    unidades_list = await db.unidades.find(
+        {"id": {"$in": unidade_ids}}, {"_id": 0, "id": 1, "nome": 1}
+    ).to_list(100)
+    unidades_map = {u["id"]: u for u in unidades_list}
+    
+    result = []
     for transferencia in transferencias:
-        # Buscar dados do produto
-        produto = await db.produtos.find_one({"id": transferencia["produto_id"]})
-        unidade_origem = await db.unidades.find_one({"id": transferencia["unidade_origem_id"]})
-        unidade_destino = await db.unidades.find_one({"id": transferencia["unidade_destino_id"]})
+        produto = produtos_map.get(transferencia["produto_id"])
+        unidade_origem = unidades_map.get(transferencia["unidade_origem_id"])
+        unidade_destino = unidades_map.get(transferencia["unidade_destino_id"])
         
         transferencia_clean = {
-            "id": transferencia.get("id", str(transferencia.get("_id", ""))),
+            "id": transferencia.get("id", ""),
             "produto_id": transferencia["produto_id"],
             "produto_nome": produto["nome"] if produto else "Produto não encontrado",
             "unidade_origem_id": transferencia["unidade_origem_id"],
