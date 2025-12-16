@@ -254,6 +254,7 @@ const PDV = ({ user }) => {
       setClienteSelecionado("");
       setMetodoPagamento("");
       setValorPago("");
+      setDescontoClube(null);
       
       toast.success(`Venda realizada com sucesso! ${metodoPagamento !== 'fiado' ? `Troco: R$ ${calcularTroco().toFixed(2)}` : ''}`);
       
