@@ -242,7 +242,9 @@ const PDV = ({ user }) => {
           preco_unitario: item.preco
         })),
         metodo_pagamento: metodoPagamento,
-        valor_pago: metodoPagamento === 'fiado' ? 0 : pago
+        valor_pago: metodoPagamento === 'fiado' ? 0 : pago,
+        desconto_clube: descontoClube ? calcularDesconto() : 0,
+        subtotal: calcularSubtotal()
       };
       
       await axios.post('/vendas', vendaData);
