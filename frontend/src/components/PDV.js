@@ -187,8 +187,19 @@ const PDV = ({ user }) => {
     toast.success('Item removido do carrinho');
   };
 
-  const calcularTotal = () => {
+  const calcularSubtotal = () => {
     return carrinho.reduce((total, item) => total + (item.preco * item.quantidade), 0);
+  };
+
+  const calcularDesconto = () => {
+    if (descontoClube && descontoClube.tem_desconto) {
+      return calcularSubtotal() * (descontoClube.percentual_desconto / 100);
+    }
+    return 0;
+  };
+
+  const calcularTotal = () => {
+    return calcularSubtotal() - calcularDesconto();
   };
 
   const calcularTroco = () => {
