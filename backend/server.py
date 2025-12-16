@@ -32,7 +32,7 @@ api_router = APIRouter(prefix="/api")
 # Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
-SECRET_KEY = "farmacia_secret_key_super_secure_2024"
+SECRET_KEY = os.environ.get("SECRET_KEY", "farmacia_secret_key_super_secure_2024")
 ALGORITHM = "HS256"
 
 # Pydantic Models
