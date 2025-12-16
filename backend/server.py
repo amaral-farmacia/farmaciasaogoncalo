@@ -2711,6 +2711,13 @@ async def get_fiados_vencidos(current_user: UserBase = Depends(get_current_user)
         except (ValueError, TypeError):
             continue
     
+    # Batch update vencidos status (avoid N+1 writes)
+    for fiado_update in fiados_to_update:
+        await db.fiados.update_one(
+            {"id": fiado_update["id"]},
+            {"$set": {"status": "vencido", "dias_vencido": fiado_update["dias_vencido"]}}
+        )
+    
     # Ordenar por dias vencidos (mais vencido primeiro)
     fiados_vencidos.sort(key=lambda x: x["dias_vencido"], reverse=True)
     
