@@ -117,6 +117,8 @@ function App() {
                     <Route path="/dashboard-unidades" element={<DashboardUnidades user={user} />} />
                     <Route path="/usuarios" element={<Usuarios user={user} />} />
                     <Route path="/notas-fiscais" element={<NotasFiscais user={user} />} />
+                    <Route path="/dre" element={<DRE user={user} />} />
+                    <Route path="/fiados-vencidos" element={<FiadosVencidos user={user} />} />
                   </>
                 )}
                 {/* Relatório de lucro para colaboradores também */}

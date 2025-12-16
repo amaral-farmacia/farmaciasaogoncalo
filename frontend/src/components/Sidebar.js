@@ -17,7 +17,9 @@ import {
   PackagePlus,
   ArrowRightLeft,
   Building2,
-  TrendingUp
+  TrendingUp,
+  ClipboardList,
+  AlertTriangle
 } from "lucide-react";
 
 const Sidebar = ({ user, onLogout }) => {
@@ -41,6 +43,8 @@ const Sidebar = ({ user, onLogout }) => {
     { path: "/boletos", icon: Receipt, label: "Boletos" },
     { path: "/fechamento", icon: Calculator, label: "Fechamento" },
     ...(user.role === 'admin' ? [
+      { path: "/dre", icon: ClipboardList, label: "DRE" },
+      { path: "/fiados-vencidos", icon: AlertTriangle, label: "Fiados Vencidos" },
       { path: "/usuarios", icon: User, label: "Usuários" },
       { path: "/notas-fiscais", icon: FileText, label: "NFe" }
     ] : [])
