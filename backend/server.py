@@ -2651,11 +2651,20 @@ async def get_fiados_vencidos(current_user: UserBase = Depends(get_current_user)
     fiados = await db.fiados.find({
         "unidade_id": current_user.unidade_id,
         "status": {"$in": ["pendente", "pago_parcial"]}
-    }).to_list(1000)
+    }, {"_id": 0}).to_list(1000)
+    
+    # Batch fetch all clientes to avoid N+1 query
+    cliente_ids = list(set(fiado["cliente_id"] for fiado in fiados if fiado.get("cliente_id")))
+    clientes_list = await db.clientes.find(
+        {"id": {"$in": cliente_ids}},
+        {"_id": 0, "id": 1, "nome": 1, "telefone": 1}
+    ).to_list(1000)
+    clientes_map = {c["id"]: c for c in clientes_list}
     
     fiados_vencidos = []
     fiados_vencem_hoje = []
     fiados_vencem_3_dias = []
+    fiados_to_update = []
     
     for fiado in fiados:
         if not fiado.get("data_vencimento"):
@@ -2665,13 +2674,13 @@ async def get_fiados_vencidos(current_user: UserBase = Depends(get_current_user)
             data_vencimento = datetime.fromisoformat(fiado["data_vencimento"]).date()
             dias_diferenca = (hoje - data_vencimento).days
             
-            # Buscar dados do cliente
-            cliente = await db.clientes.find_one({"id": fiado["cliente_id"]})
+            # Buscar dados do cliente do cache
+            cliente = clientes_map.get(fiado["cliente_id"])
             cliente_nome = cliente["nome"] if cliente else "Cliente não encontrado"
             cliente_telefone = cliente.get("telefone", "") if cliente else ""
             
             fiado_info = {
-                "id": fiado.get("id", str(fiado.get("_id", ""))),
+                "id": fiado.get("id", ""),
                 "cliente_id": fiado["cliente_id"],
                 "cliente_nome": cliente_nome,
                 "cliente_telefone": cliente_telefone,
@@ -2689,12 +2698,7 @@ async def get_fiados_vencidos(current_user: UserBase = Depends(get_current_user)
                 fiado_info["status"] = "vencido"
                 fiado_info["alerta"] = "VENCIDO"
                 fiados_vencidos.append(fiado_info)
-                
-                # Atualizar status no banco
-                await db.fiados.update_one(
-                    {"id": fiado.get("id")},
-                    {"$set": {"status": "vencido", "dias_vencido": dias_diferenca}}
-                )
+                fiados_to_update.append({"id": fiado.get("id"), "dias_vencido": dias_diferenca})
                 
             elif dias_diferenca == 0:  # Vence hoje
                 fiado_info["alerta"] = "VENCE HOJE"
