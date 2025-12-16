@@ -33,6 +33,10 @@ const PDV = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [buscandoProduto, setBuscandoProduto] = useState(false);
   const inputRef = useRef(null);
+  
+  // Clube de Vantagens
+  const [descontoClube, setDescontoClube] = useState(null);
+  const [verificandoClube, setVerificandoClube] = useState(false);
 
   useEffect(() => {
     fetchClientes();
