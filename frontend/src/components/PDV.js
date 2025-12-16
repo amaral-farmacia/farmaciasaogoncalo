@@ -493,12 +493,33 @@ const PDV = ({ user }) => {
             <CardContent className="p-6 space-y-6">
               {/* Total */}
               <div className="bg-gradient-to-r from-emerald-50 to-cyan-50 p-4 rounded-lg border border-emerald-200">
-                <div className="text-center">
-                  <p className="text-sm text-emerald-700 mb-1">Total da Venda</p>
-                  <p className="text-3xl font-bold text-emerald-900">
-                    {formatCurrency(calcularTotal())}
-                  </p>
-                </div>
+                {descontoClube && descontoClube.tem_desconto ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Subtotal:</span>
+                      <span>{formatCurrency(calcularSubtotal())}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-green-600 font-medium">
+                      <span>Desconto Clube ({descontoClube.percentual_desconto}%):</span>
+                      <span>-{formatCurrency(calcularDesconto())}</span>
+                    </div>
+                    <div className="border-t border-emerald-200 pt-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-emerald-700 font-medium">Total:</span>
+                        <span className="text-2xl font-bold text-emerald-900">
+                          {formatCurrency(calcularTotal())}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-sm text-emerald-700 mb-1">Total da Venda</p>
+                    <p className="text-3xl font-bold text-emerald-900">
+                      {formatCurrency(calcularTotal())}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Cliente */}
