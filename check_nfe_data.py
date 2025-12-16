@@ -4,7 +4,7 @@ import requests
 import sys
 
 def check_nfe_data():
-    base_url = "https://med-inventory-15.preview.emergentagent.com/api"
+    base_url = "https://pharmatrack-44.preview.emergentagent.com/api"
     
     # Login first
     login_response = requests.post(f"{base_url}/auth/login", json={

@@ -4,7 +4,7 @@ import requests
 import json
 
 def test_angical_user():
-    base_url = "https://med-inventory-15.preview.emergentagent.com/api"
+    base_url = "https://pharmatrack-44.preview.emergentagent.com/api"
     
     print("🔍 TESTING ANGICAL USER CREATION AND AUTHENTICATION")
     print("=" * 60)

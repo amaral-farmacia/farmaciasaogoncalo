@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import json
 
 class FarmaciaAPITester:
-    def __init__(self, base_url="https://med-inventory-15.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://pharmatrack-44.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.token = None
         self.user_data = None
