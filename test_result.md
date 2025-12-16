@@ -423,3 +423,76 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ ANGICAL UNIT DATA VERIFICATION AND CLEANUP COMPLETED SUCCESSFULLY: Unit Count Verification passed - GET /api/unidades returns exactly 2 units (cleanup successful). Angical Unit Data verified - unit has correct data: nome='Farmácia São Gonçalo Angical', endereco='Angical - BA', telefone='77999178367', email='amaralfarmacias@gmail.com', responsavel='Arquimedes Oliveira do Amaral'. Dashboard Units verified - GET /api/dashboard/unidades returns 2 units maximum with correct data structure. User-Unit Assignment verified - admin user assigned to main unit, angical user assigned to Angical unit. Authentication and Access verified - both users can login and access their respective data (admin/admin123 and angical/angical123). Database cleanup successful - removed duplicate units and users, maintaining only the required 2 units and 2 users. All requirements met: exactly 2 units exist, Angical unit has correct contact information, unit cleanup removed duplicates, user assignments correct, authentication working. 100% success rate (10/10 tests passed)."
+  - task: "DRE Frontend Component"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/DRE.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Componente DRE implementado com tabs para DRE Mensal e Diário, cards de resumo (Receita Líquida, CPV, Lucro Bruto, Resultado Líquido), tabela detalhada de DRE com todas as linhas (receita bruta, deduções, CPV, despesas operacionais), e indicadores de performance (margem bruta, operacional, líquida). Integrado na rota /dre e sidebar (admin only)."
+
+  - task: "Fiados Vencidos Frontend Component"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/FiadosVencidos.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Componente FiadosVencidos implementado com cards de resumo (Vencidos, Vencem Hoje, Vencem em 3 Dias, Total Geral), tabs para filtrar por categoria, cards detalhados para cada fiado com informações do cliente, valor pendente/pago, data vencimento, dias vencido. Inclui botão de alteração de vencimento e integração WhatsApp. Integrado na rota /fiados-vencidos e sidebar (admin only)."
+
+  - task: "Clube de Vantagens PDV Integration"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/PDV.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "PDV atualizado para verificar automaticamente se cliente selecionado tem direito a desconto do Clube de Vantagens (10% para top 5 clientes do mês). Exibe badge do clube quando cliente elegível, mostra subtotal, desconto e total final. Desconto é enviado nos dados da venda."
+
+  - task: "Sidebar Navigation Update"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Sidebar.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Sidebar atualizado com links para DRE e Fiados Vencidos (admin only). Ícones ClipboardList e AlertTriangle adicionados."
+
+  - task: "App.js Route Integration"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Rotas /dre e /fiados-vencidos adicionadas ao App.js para admin users."
+
+test_plan:
+  current_focus:
+    - "DRE Frontend Component"
+    - "Fiados Vencidos Frontend Component"
+    - "Clube de Vantagens PDV Integration"
+    - "Sidebar Navigation Update"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Implementação das funcionalidades avançadas completada: DRE (Demonstração do Resultado do Exercício) com visualização mensal e diária, Fiados Vencidos com alertas e categorização, Clube de Vantagens integrado no PDV com desconto automático de 10% para top 5 clientes. Navegação atualizada no Sidebar e App.js. Pronto para testes completos."
