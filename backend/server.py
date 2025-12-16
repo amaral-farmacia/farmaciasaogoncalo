@@ -1339,14 +1339,24 @@ async def alterar_senha_usuario(user_id: str, senha_data: dict, current_user: Us
 @api_router.get("/entradas")
 async def get_entradas_mercadorias(current_user: UserBase = Depends(get_current_user)):
     """Lista todas as entradas de mercadorias"""
-    entradas = await db.entradas_mercadorias.find({"unidade_id": current_user.unidade_id}).to_list(1000)
+    entradas = await db.entradas_mercadorias.find(
+        {"unidade_id": current_user.unidade_id}, {"_id": 0}
+    ).to_list(1000)
+    
+    # Batch fetch all produtos to avoid N+1 query
+    produto_ids = list(set(entrada["produto_id"] for entrada in entradas))
+    produtos_list = await db.produtos.find(
+        {"id": {"$in": produto_ids}},
+        {"_id": 0, "id": 1, "nome": 1}
+    ).to_list(10000)
+    produtos_map = {p["id"]: p for p in produtos_list}
+    
     result = []
     for entrada in entradas:
-        # Buscar dados do produto
-        produto = await db.produtos.find_one({"id": entrada["produto_id"]})
+        produto = produtos_map.get(entrada["produto_id"])
         
         entrada_clean = {
-            "id": entrada.get("id", str(entrada.get("_id", ""))),
+            "id": entrada.get("id", ""),
             "produto_id": entrada["produto_id"],
             "produto_nome": produto["nome"] if produto else "Produto não encontrado",
             "quantidade": entrada["quantidade"],
