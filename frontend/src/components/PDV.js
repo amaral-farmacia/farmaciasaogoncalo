@@ -255,7 +255,34 @@ const PDV = ({ user }) => {
         subtotal: calcularSubtotal()
       };
       
-      await axios.post('/vendas', vendaData);
+      const response = await axios.post('/vendas', vendaData);
+      
+      // Preparar dados para o cupom
+      const clienteNome = clienteSelecionado 
+        ? clientes.find(c => c.id === clienteSelecionado)?.nome || "Cliente"
+        : "Consumidor Final";
+      
+      const dadosCupom = {
+        id: response.data?.id || Date.now().toString(),
+        data: new Date(),
+        items: carrinho.map(item => ({
+          nome: item.nome,
+          quantidade: item.quantidade,
+          preco_unitario: item.preco,
+          subtotal: item.preco * item.quantidade
+        })),
+        subtotal: calcularSubtotal(),
+        desconto: descontoClube ? calcularDesconto() : 0,
+        total: total,
+        metodo_pagamento: metodoPagamento,
+        valor_pago: pago,
+        troco: calcularTroco(),
+        cliente: clienteNome,
+        vendedor: user.full_name
+      };
+      
+      setDadosVenda(dadosCupom);
+      setShowCupom(true);
       
       // Limpar carrinho e campos
       setCarrinho([]);
@@ -266,13 +293,65 @@ const PDV = ({ user }) => {
       
       toast.success(`Venda realizada com sucesso! ${metodoPagamento !== 'fiado' ? `Troco: R$ ${calcularTroco().toFixed(2)}` : ''}`);
       
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
     } catch (error) {
       toast.error('Erro ao finalizar venda');
     } finally {
       setLoading(false);
+    }
+  };
+  
+  // Função para imprimir o cupom
+  const imprimirCupom = () => {
+    const conteudoCupom = cupomRef.current;
+    if (!conteudoCupom) return;
+    
+    const janela = window.open('', '_blank', 'width=300,height=600');
+    janela.document.write(`
+      <html>
+        <head>
+          <title>Cupom - Farmácia São Gonçalo</title>
+          <style>
+            body {
+              font-family: 'Courier New', monospace;
+              font-size: 12px;
+              width: 280px;
+              margin: 0 auto;
+              padding: 10px;
+            }
+            .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+            .header h1 { font-size: 16px; margin: 0; }
+            .header p { margin: 2px 0; font-size: 10px; }
+            .items { border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+            .item { display: flex; justify-content: space-between; margin: 5px 0; }
+            .item-name { flex: 1; }
+            .item-qty { width: 40px; text-align: center; }
+            .item-price { width: 70px; text-align: right; }
+            .totals { margin-bottom: 10px; }
+            .total-line { display: flex; justify-content: space-between; margin: 3px 0; }
+            .total-final { font-weight: bold; font-size: 14px; border-top: 1px dashed #000; padding-top: 5px; }
+            .footer { text-align: center; font-size: 10px; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px; }
+            @media print { body { width: 100%; } }
+          </style>
+        </head>
+        <body>
+          ${conteudoCupom.innerHTML}
+          <script>
+            window.onload = function() {
+              window.print();
+              window.onafterprint = function() { window.close(); };
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    janela.document.close();
+  };
+  
+  const fecharCupom = () => {
+    setShowCupom(false);
+    setDadosVenda(null);
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   };
 
