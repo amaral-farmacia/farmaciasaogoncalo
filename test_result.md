@@ -423,6 +423,42 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ ANGICAL UNIT DATA VERIFICATION AND CLEANUP COMPLETED SUCCESSFULLY: Unit Count Verification passed - GET /api/unidades returns exactly 2 units (cleanup successful). Angical Unit Data verified - unit has correct data: nome='Farmácia São Gonçalo Angical', endereco='Angical - BA', telefone='77999178367', email='amaralfarmacias@gmail.com', responsavel='Arquimedes Oliveira do Amaral'. Dashboard Units verified - GET /api/dashboard/unidades returns 2 units maximum with correct data structure. User-Unit Assignment verified - admin user assigned to main unit, angical user assigned to Angical unit. Authentication and Access verified - both users can login and access their respective data (admin/admin123 and angical/angical123). Database cleanup successful - removed duplicate units and users, maintaining only the required 2 units and 2 users. All requirements met: exactly 2 units exist, Angical unit has correct contact information, unit cleanup removed duplicates, user assignments correct, authentication working. 100% success rate (10/10 tests passed)."
+
+  - task: "DRE API Backend"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DRE API TESTING COMPLETED SUCCESSFULLY: GET /api/relatorios/dre working perfectly with complete data structure validation. Monthly reports (tipo=mensal&data=YYYY-MM) return complete DRE structure with periodo, dre (receita_bruta, deducoes_receita, receita_liquida, custo_produtos_vendidos, lucro_bruto, despesas_operacionais, resultado_operacional, resultado_liquido), and indicadores (margem_bruta, margem_operacional, margem_liquida, total_transacoes). Daily reports (tipo=diario&data=YYYY-MM-DD) work with same structure for specific dates. Authentication required - 403 Forbidden returned for unauthenticated requests. Both admin and collaborator users can access DRE reports. All calculations working correctly including CPV calculation from product costs and sales data. 100% success rate (4/4 DRE tests passed)."
+
+  - task: "Fiados Vencidos API Backend"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FIADOS VENCIDOS API TESTING COMPLETED SUCCESSFULLY: GET /api/fiados-vencidos returns complete structure with resumo (total_vencidos, total_vencem_hoje, total_vencem_3_dias, valor_total_vencido, valor_vence_hoje, valor_vence_3_dias), arrays (fiados_vencidos, vencem_hoje, vencem_em_3_dias), and data_consulta. PUT /api/fiados/{fiado_id}/definir-vencimento working for setting due dates with proper validation. GET /api/alertas-fiados returns dashboard alerts with proper structure (tipo, titulo, valor, icone, cor). Authentication required for all endpoints. Automatic status updates working (pendente->vencido based on dates). Both admin and collaborator access verified. 100% success rate (4/4 fiados tests passed)."
+
+  - task: "Clube de Vantagens API Backend"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CLUBE DE VANTAGENS API TESTING COMPLETED SUCCESSFULLY: GET /api/clube-vantagens/top-clientes returns complete structure with periodo_analise, clube_vantagens (desconto_percentual=10%, total_clientes_elegíveis, criterio=top_5_compradores_mes), top_clientes array with client details (nome, total_compras, total_transacoes, ticket_medio, desconto_clube, status_clube), and estatisticas (total_clientes_com_compras, total_vendas_periodo, valor_medio_top_5). GET /api/clube-vantagens/verificar-cliente/{cliente_id} working correctly - returns tem_desconto=true/false, desconto_percentual, cliente data, posicao_ranking, and appropriate messages. Proper handling for both eligible and non-eligible clients. Authentication required. Both admin and collaborator access verified. 100% success rate (3/3 clube tests passed)."
   - task: "DRE Frontend Component"
     implemented: true
     working: true
