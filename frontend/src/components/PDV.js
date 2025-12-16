@@ -80,6 +80,35 @@ const PDV = ({ user }) => {
     }
   };
 
+  // Verificar desconto do Clube de Vantagens
+  const verificarDescontoClube = async (clienteId) => {
+    if (!clienteId) {
+      setDescontoClube(null);
+      return;
+    }
+    
+    setVerificandoClube(true);
+    try {
+      const response = await axios.get(`/clube-vantagens/verificar-cliente/${clienteId}`);
+      if (response.data.tem_desconto) {
+        setDescontoClube(response.data);
+        toast.success(`🎉 ${response.data.message}`, { duration: 4000 });
+      } else {
+        setDescontoClube(null);
+      }
+    } catch (error) {
+      setDescontoClube(null);
+    } finally {
+      setVerificandoClube(false);
+    }
+  };
+
+  // Quando cliente é selecionado, verificar Clube de Vantagens
+  const handleClienteChange = (clienteId) => {
+    setClienteSelecionado(clienteId);
+    verificarDescontoClube(clienteId);
+  };
+
   const buscarProduto = async () => {
     if (!codigoBarras.trim()) return;
     
