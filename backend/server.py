@@ -2377,13 +2377,21 @@ async def get_relatorio_unidade(
             quantidade = item.get("quantidade", 0)
             produtos_vendidos[produto_id] = produtos_vendidos.get(produto_id, 0) + quantidade
     
+    # Batch fetch top 5 produtos to avoid N+1 query
+    top_5_ids = [pid for pid, _ in sorted(produtos_vendidos.items(), key=lambda x: x[1], reverse=True)[:5]]
+    produtos_top_list = await db.produtos.find(
+        {"id": {"$in": top_5_ids}},
+        {"_id": 0, "id": 1, "nome": 1, "quantidade": 1}
+    ).to_list(10)
+    produtos_top_map = {p["id"]: p for p in produtos_top_list}
+    
     top_produtos = []
-    for produto_id, quantidade in sorted(produtos_vendidos.items(), key=lambda x: x[1], reverse=True)[:5]:
-        produto = await db.produtos.find_one({"id": produto_id})
+    for produto_id in top_5_ids:
+        produto = produtos_top_map.get(produto_id)
         if produto:
             top_produtos.append({
                 "nome": produto["nome"],
-                "quantidade_vendida": quantidade,
+                "quantidade_vendida": produtos_vendidos[produto_id],
                 "estoque_atual": produto["quantidade"]
             })
     
