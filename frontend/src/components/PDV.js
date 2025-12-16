@@ -506,7 +506,7 @@ const PDV = ({ user }) => {
                 <label className="text-sm font-medium text-gray-700">
                   Cliente (opcional)
                 </label>
-                <Select value={clienteSelecionado} onValueChange={setClienteSelecionado}>
+                <Select value={clienteSelecionado} onValueChange={handleClienteChange}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecionar cliente" />
                   </SelectTrigger>
@@ -518,6 +518,32 @@ const PDV = ({ user }) => {
                     ))}
                   </SelectContent>
                 </Select>
+                
+                {/* Indicador de verificação do Clube */}
+                {verificandoClube && (
+                  <div className="flex items-center gap-2 text-xs text-blue-600">
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
+                    Verificando Clube de Vantagens...
+                  </div>
+                )}
+                
+                {/* Badge do Clube de Vantagens */}
+                {descontoClube && descontoClube.tem_desconto && (
+                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 p-3 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">🏆</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-yellow-800">Clube de Vantagens</p>
+                        <p className="text-xs text-yellow-700">
+                          {descontoClube.cliente.nome} • #{descontoClube.posicao_ranking} no ranking
+                        </p>
+                      </div>
+                      <Badge className="bg-green-500 text-white">
+                        -{descontoClube.percentual_desconto}%
+                      </Badge>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Método de Pagamento */}
