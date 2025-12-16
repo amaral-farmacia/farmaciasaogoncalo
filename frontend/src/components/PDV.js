@@ -749,6 +749,125 @@ const PDV = ({ user }) => {
           </Card>
         </div>
       </div>
+      
+      {/* Dialog de Impressão do Cupom */}
+      <Dialog open={showCupom} onOpenChange={setShowCupom}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Printer className="h-5 w-5" />
+              Venda Finalizada!
+            </DialogTitle>
+            <DialogDescription>
+              Deseja imprimir o cupom para o cliente?
+            </DialogDescription>
+          </DialogHeader>
+          
+          {dadosVenda && (
+            <div className="space-y-4">
+              {/* Preview do Cupom */}
+              <div 
+                ref={cupomRef}
+                className="bg-white border rounded-lg p-4 font-mono text-xs max-h-80 overflow-y-auto"
+              >
+                <div className="header text-center border-b border-dashed pb-2 mb-2">
+                  <h1 className="font-bold text-sm">FARMÁCIA SÃO GONÇALO</h1>
+                  <p className="text-[10px]">CNPJ: 12.345.678/0001-00</p>
+                  <p className="text-[10px]">Rua Principal, 123 - Centro</p>
+                  <p className="text-[10px]">Tel: (77) 99999-1111</p>
+                </div>
+                
+                <div className="text-center mb-2">
+                  <p className="text-[10px]">CUPOM NÃO FISCAL</p>
+                  <p className="text-[10px]">
+                    {dadosVenda.data.toLocaleDateString('pt-BR')} {dadosVenda.data.toLocaleTimeString('pt-BR')}
+                  </p>
+                </div>
+                
+                <div className="border-b border-dashed pb-2 mb-2">
+                  <p className="text-[10px]">Cliente: {dadosVenda.cliente}</p>
+                  <p className="text-[10px]">Vendedor: {dadosVenda.vendedor}</p>
+                </div>
+                
+                <div className="items border-b border-dashed pb-2 mb-2">
+                  <div className="flex justify-between font-bold mb-1">
+                    <span className="flex-1">ITEM</span>
+                    <span className="w-8 text-center">QTD</span>
+                    <span className="w-16 text-right">VALOR</span>
+                  </div>
+                  {dadosVenda.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between py-0.5">
+                      <span className="flex-1 truncate pr-1">{item.nome}</span>
+                      <span className="w-8 text-center">{item.quantidade}</span>
+                      <span className="w-16 text-right">{formatCurrency(item.subtotal)}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="totals space-y-1">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span>{formatCurrency(dadosVenda.subtotal)}</span>
+                  </div>
+                  {dadosVenda.desconto > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Desconto Clube:</span>
+                      <span>-{formatCurrency(dadosVenda.desconto)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-sm border-t border-dashed pt-1">
+                    <span>TOTAL:</span>
+                    <span>{formatCurrency(dadosVenda.total)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Pagamento:</span>
+                    <span className="capitalize">{dadosVenda.metodo_pagamento}</span>
+                  </div>
+                  {dadosVenda.metodo_pagamento !== 'fiado' && (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Valor Pago:</span>
+                        <span>{formatCurrency(dadosVenda.valor_pago)}</span>
+                      </div>
+                      {dadosVenda.troco > 0 && (
+                        <div className="flex justify-between font-bold">
+                          <span>Troco:</span>
+                          <span>{formatCurrency(dadosVenda.troco)}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+                
+                <div className="footer text-center border-t border-dashed pt-2 mt-2">
+                  <p className="text-[10px]">Obrigado pela preferência!</p>
+                  <p className="text-[10px]">Volte sempre!</p>
+                  <p className="text-[10px] mt-1">********************************</p>
+                </div>
+              </div>
+              
+              {/* Botões de Ação */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={imprimirCupom}
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  Imprimir Cupom
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={fecharCupom}
+                  className="flex-1"
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Não Imprimir
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
