@@ -2605,10 +2605,18 @@ async def get_top_clientes_clube_vantagens(current_user: UserBase = Depends(get_
             vendas_por_cliente[cliente_id]["total_compras"] += valor
             vendas_por_cliente[cliente_id]["total_transacoes"] += 1
     
-    # Calcular ticket médio e buscar dados dos clientes
+    # Batch fetch all clientes to avoid N+1 query
+    cliente_ids = list(vendas_por_cliente.keys())
+    clientes_list = await db.clientes.find(
+        {"id": {"$in": cliente_ids}, "unidade_id": current_user.unidade_id},
+        {"_id": 0, "id": 1, "nome": 1, "cpf": 1, "telefone": 1}
+    ).to_list(1000)
+    clientes_map = {c["id"]: c for c in clientes_list}
+    
+    # Calcular ticket médio e montar lista de top clientes
     top_clientes = []
     for cliente_id, dados in vendas_por_cliente.items():
-        cliente = await db.clientes.find_one({"id": cliente_id, "unidade_id": current_user.unidade_id})
+        cliente = clientes_map.get(cliente_id)
         if cliente:
             ticket_medio = dados["total_compras"] / dados["total_transacoes"]
             top_clientes.append({
