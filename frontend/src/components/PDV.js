@@ -768,7 +768,7 @@ const PDV = ({ user }) => {
               {/* Preview do Cupom */}
               <div 
                 ref={cupomRef}
-                className="bg-white border rounded-lg p-4 font-mono text-xs max-h-80 overflow-y-auto"
+                className="bg-white border rounded-lg p-4 font-mono text-xs max-h-96 overflow-y-auto"
               >
                 <div className="header text-center border-b border-dashed pb-2 mb-2">
                   <h1 className="font-bold text-sm">FARMÁCIA SÃO GONÇALO</h1>
