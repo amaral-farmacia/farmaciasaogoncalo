@@ -19,6 +19,8 @@ import EntradaMercadorias from "./components/EntradaMercadorias";
 import TransferenciaProdutos from "./components/TransferenciaProdutos";
 import DashboardUnidades from "./components/DashboardUnidades";
 import RelatorioLucro from "./components/RelatorioLucro";
+import DRE from "./components/DRE";
+import FiadosVencidos from "./components/FiadosVencidos";
 import Sidebar from "./components/Sidebar";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
