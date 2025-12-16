@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { 
   ShoppingCart, 
   Search, 
@@ -16,7 +17,9 @@ import {
   User,
   CreditCard,
   Banknote,
-  Smartphone
+  Smartphone,
+  Printer,
+  X
 } from "lucide-react";
 import { toast } from "sonner";
 
