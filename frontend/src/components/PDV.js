@@ -40,6 +40,11 @@ const PDV = ({ user }) => {
   // Clube de Vantagens
   const [descontoClube, setDescontoClube] = useState(null);
   const [verificandoClube, setVerificandoClube] = useState(false);
+  
+  // Impressão de Cupom
+  const [showCupom, setShowCupom] = useState(false);
+  const [dadosVenda, setDadosVenda] = useState(null);
+  const cupomRef = useRef(null);
 
   useEffect(() => {
     fetchClientes();
