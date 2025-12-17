@@ -772,9 +772,9 @@ const PDV = ({ user }) => {
               >
                 <div className="header text-center border-b border-dashed pb-2 mb-2">
                   <h1 className="font-bold text-sm">FARMÁCIA SÃO GONÇALO</h1>
-                  <p className="text-[10px]">CNPJ: 12.345.678/0001-00</p>
-                  <p className="text-[10px]">Rua Principal, 123 - Centro</p>
-                  <p className="text-[10px]">Tel: (77) 99999-1111</p>
+                  <p className="text-[10px]">CNPJ: 47.696.805/0001-85</p>
+                  <p className="text-[10px]">Rua Otavio Manabeira</p>
+                  <p className="text-[10px]">Tel: (77) 99840-3791</p>
                 </div>
                 
                 <div className="text-center mb-2">
