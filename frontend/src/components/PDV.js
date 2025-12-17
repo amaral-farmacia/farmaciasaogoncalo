@@ -319,7 +319,7 @@ const PDV = ({ user }) => {
               padding: 10px;
             }
             .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
-            .header h1 { font-size: 16px; margin: 0; }
+            .header h1 { font-size: 16px; margin: 0; font-weight: bold; }
             .header p { margin: 2px 0; font-size: 10px; }
             .items { border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
             .item { display: flex; justify-content: space-between; margin: 5px 0; }
