@@ -373,7 +373,7 @@ const TransferenciaProdutos = ({ user }) => {
                 <Badge className={getStatusColor(transferencia.status)}>
                   <div className="flex items-center gap-1">
                     {getStatusIcon(transferencia.status)}
-                    {transferencia.status}
+                    {getStatusLabel(transferencia.status)}
                   </div>
                 </Badge>
               </div>
