@@ -2096,8 +2096,8 @@ async def receber_transferencia(transferencia_id: str, current_user: UserBase = 
     if not transferencia:
         raise HTTPException(status_code=404, detail="Transferência não encontrada")
     
-    # Verificar se o usuário é da unidade destino
-    if transferencia["unidade_destino_id"] != current_user.unidade_id:
+    # Verificar se o usuário é da unidade destino ou admin
+    if current_user.role != 'admin' and transferencia["unidade_destino_id"] != current_user.unidade_id:
         raise HTTPException(status_code=403, detail="Você só pode receber transferências destinadas à sua unidade")
     
     if transferencia["status"] != "confirmada":
