@@ -928,10 +928,22 @@ const PDV = ({ user }) => {
                     <span>Subtotal:</span>
                     <span>{formatCurrency(dadosVenda.subtotal)}</span>
                   </div>
-                  {dadosVenda.desconto > 0 && (
+                  {dadosVenda.desconto_clube > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Desconto Clube:</span>
-                      <span>-{formatCurrency(dadosVenda.desconto)}</span>
+                      <span>-{formatCurrency(dadosVenda.desconto_clube)}</span>
+                    </div>
+                  )}
+                  {dadosVenda.desconto_cupom > 0 && (
+                    <div className="flex justify-between text-purple-600">
+                      <span>Cupom ({dadosVenda.cupom_nome}):</span>
+                      <span>-{formatCurrency(dadosVenda.desconto_cupom)}</span>
+                    </div>
+                  )}
+                  {dadosVenda.desconto_total > 0 && (
+                    <div className="flex justify-between text-green-700 font-medium">
+                      <span>Desconto Total:</span>
+                      <span>-{formatCurrency(dadosVenda.desconto_total)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-sm border-t border-dashed pt-1">
