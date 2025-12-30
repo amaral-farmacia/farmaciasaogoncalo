@@ -41,6 +41,11 @@ const PDV = ({ user }) => {
   const [descontoClube, setDescontoClube] = useState(null);
   const [verificandoClube, setVerificandoClube] = useState(false);
   
+  // Cupom de Desconto
+  const [codigoCupom, setCodigoCupom] = useState("");
+  const [cupomAplicado, setCupomAplicado] = useState(null);
+  const [aplicandoCupom, setAplicandoCupom] = useState(false);
+  
   // Impressão de Cupom
   const [showCupom, setShowCupom] = useState(false);
   const [dadosVenda, setDadosVenda] = useState(null);
