@@ -23,6 +23,7 @@ import { toast } from "sonner";
 
 const Usuarios = ({ user }) => {
   const [usuarios, setUsuarios] = useState([]);
+  const [unidades, setUnidades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [senhaDialogOpen, setSenhaDialogOpen] = useState(false);
@@ -32,7 +33,8 @@ const Usuarios = ({ user }) => {
     username: "",
     password: "",
     full_name: "",
-    role: "colaborador"
+    role: "colaborador",
+    unidade_id: ""
   });
   const [senhaData, setSenhaData] = useState({
     nova_senha: "",
@@ -44,8 +46,24 @@ const Usuarios = ({ user }) => {
       toast.error('Acesso negado. Apenas administradores podem gerenciar usuários.');
       return;
     }
-    fetchUsuarios();
+    fetchData();
   }, [user]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [usuariosRes, unidadesRes] = await Promise.all([
+        axios.get('/usuarios'),
+        axios.get('/unidades')
+      ]);
+      setUsuarios(usuariosRes.data);
+      setUnidades(unidadesRes.data);
+    } catch (error) {
+      toast.error('Erro ao carregar dados');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchUsuarios = async () => {
     try {
