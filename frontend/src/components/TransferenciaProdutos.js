@@ -418,29 +418,29 @@ const TransferenciaProdutos = ({ user }) => {
                     className="flex-1 bg-green-600 hover:bg-green-700"
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
-                    Confirmar
+                    Confirmar Envio
                   </Button>
                 )}
                 
-                {transferencia.status === 'confirmada' && transferencia.unidade_destino_id === user.unidade_id && (
+                {transferencia.status === 'confirmada' && (
+                  transferencia.unidade_destino_id === user.unidade_id || user.role === 'admin'
+                ) && (
                   <Button
                     onClick={() => receberTransferencia(transferencia.id)}
                     size="sm"
                     className="flex-1 bg-blue-600 hover:bg-blue-700"
                   >
                     <Package className="mr-2 h-4 w-4" />
-                    Receber
+                    Confirmar Recebimento
                   </Button>
                 )}
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-10 h-8 p-0"
-                  onClick={() => toast.info('Detalhes em desenvolvimento')}
-                >
-                  <Eye className="h-3 w-3" />
-                </Button>
+                {transferencia.status === 'recebida' && (
+                  <div className="flex-1 flex items-center justify-center gap-2 text-green-600 text-sm font-medium">
+                    <CheckCircle className="h-4 w-4" />
+                    Produto adicionado ao estoque
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
