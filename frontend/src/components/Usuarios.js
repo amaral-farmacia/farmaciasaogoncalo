@@ -254,6 +254,22 @@ const Usuarios = ({ user }) => {
                 </Select>
               </div>
               
+              <div className="space-y-2">
+                <Label>Unidade *</Label>
+                <Select value={formData.unidade_id} onValueChange={(value) => setFormData({...formData, unidade_id: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a unidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {unidades.map((unidade) => (
+                      <SelectItem key={unidade.id} value={unidade.id}>
+                        {unidade.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <div className="flex gap-3 pt-4">
                 <Button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700">
                   Criar Usuário
