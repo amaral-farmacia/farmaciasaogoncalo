@@ -80,6 +80,11 @@ const Usuarios = ({ user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!formData.unidade_id) {
+      toast.error('Selecione uma unidade para o usuário');
+      return;
+    }
+    
     try {
       await axios.post('/usuarios', formData);
       toast.success('Usuário criado com sucesso');
@@ -88,12 +93,13 @@ const Usuarios = ({ user }) => {
         username: "",
         password: "",
         full_name: "",
-        role: "colaborador"
+        role: "colaborador",
+        unidade_id: ""
       });
       setDialogOpen(false);
       fetchUsuarios();
     } catch (error) {
-      toast.error('Erro ao criar usuário');
+      toast.error(error.response?.data?.detail || 'Erro ao criar usuário');
     }
   };
 
