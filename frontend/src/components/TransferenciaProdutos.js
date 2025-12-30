@@ -119,7 +119,8 @@ const TransferenciaProdutos = ({ user }) => {
     switch (status) {
       case 'pendente': return 'bg-yellow-100 text-yellow-800';
       case 'em_transito': return 'bg-blue-100 text-blue-800';
-      case 'confirmada': return 'bg-green-100 text-green-800';
+      case 'confirmada': return 'bg-orange-100 text-orange-800';
+      case 'recebida': return 'bg-green-100 text-green-800';
       case 'cancelada': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -129,9 +130,21 @@ const TransferenciaProdutos = ({ user }) => {
     switch (status) {
       case 'pendente': return <Clock className="h-4 w-4" />;
       case 'em_transito': return <ArrowRightLeft className="h-4 w-4" />;
-      case 'confirmada': return <CheckCircle className="h-4 w-4" />;
+      case 'confirmada': return <Package className="h-4 w-4" />;
+      case 'recebida': return <CheckCircle className="h-4 w-4" />;
       case 'cancelada': return <AlertCircle className="h-4 w-4" />;
       default: return <Clock className="h-4 w-4" />;
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'pendente': return 'Pendente';
+      case 'em_transito': return 'Em Trânsito';
+      case 'confirmada': return 'Aguardando Recebimento';
+      case 'recebida': return 'Recebida';
+      case 'cancelada': return 'Cancelada';
+      default: return status;
     }
   };
 
