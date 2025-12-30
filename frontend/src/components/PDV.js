@@ -308,13 +308,15 @@ const PDV = ({ user }) => {
         })),
         metodo_pagamento: metodoPagamento,
         valor_pago: metodoPagamento === 'fiado' ? 0 : pago,
-        desconto_clube: descontoClube ? calcularDesconto() : 0,
+        desconto_clube: descontoClube ? calcularDescontoClube() : 0,
+        desconto_cupom: cupomAplicado ? calcularDescontoCupom() : 0,
+        cupom_codigo: cupomAplicado?.codigo || null,
         subtotal: calcularSubtotal()
       };
       
       const response = await axios.post('/vendas', vendaData);
       
-      // Preparar dados para o cupom
+      // Preparar dados para o cupom de impressão
       const clienteNome = clienteSelecionado 
         ? clientes.find(c => c.id === clienteSelecionado)?.nome || "Cliente"
         : "Consumidor Final";
@@ -329,7 +331,10 @@ const PDV = ({ user }) => {
           subtotal: item.preco * item.quantidade
         })),
         subtotal: calcularSubtotal(),
-        desconto: descontoClube ? calcularDesconto() : 0,
+        desconto_clube: descontoClube ? calcularDescontoClube() : 0,
+        desconto_cupom: cupomAplicado ? calcularDescontoCupom() : 0,
+        cupom_nome: cupomAplicado?.nome || null,
+        desconto_total: calcularDescontoTotal(),
         total: total,
         metodo_pagamento: metodoPagamento,
         valor_pago: pago,
@@ -347,6 +352,8 @@ const PDV = ({ user }) => {
       setMetodoPagamento("");
       setValorPago("");
       setDescontoClube(null);
+      setCupomAplicado(null);
+      setCodigoCupom("");
       
       toast.success(`Venda realizada com sucesso! ${metodoPagamento !== 'fiado' ? `Troco: R$ ${calcularTroco().toFixed(2)}` : ''}`);
       
