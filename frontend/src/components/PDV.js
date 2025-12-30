@@ -638,35 +638,90 @@ const PDV = ({ user }) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              {/* Total */}
-              <div className="bg-gradient-to-r from-emerald-50 to-cyan-50 p-4 rounded-lg border border-emerald-200">
-                {descontoClube && descontoClube.tem_desconto ? (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Subtotal:</span>
-                      <span>{formatCurrency(calcularSubtotal())}</span>
-                    </div>
-                    <div className="flex justify-between text-sm text-green-600 font-medium">
-                      <span>Desconto Clube ({descontoClube.percentual_desconto}%):</span>
-                      <span>-{formatCurrency(calcularDesconto())}</span>
-                    </div>
-                    <div className="border-t border-emerald-200 pt-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-emerald-700 font-medium">Total:</span>
-                        <span className="text-2xl font-bold text-emerald-900">
-                          {formatCurrency(calcularTotal())}
-                        </span>
-                      </div>
-                    </div>
+              {/* Cupom de Desconto */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Cupom de Desconto
+                </label>
+                {!cupomAplicado ? (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Digite o código do cupom"
+                      value={codigoCupom}
+                      onChange={(e) => setCodigoCupom(e.target.value.toUpperCase())}
+                      onKeyPress={(e) => e.key === 'Enter' && aplicarCupom()}
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={aplicarCupom}
+                      disabled={aplicandoCupom || !codigoCupom.trim()}
+                      variant="outline"
+                      className="px-4"
+                    >
+                      {aplicandoCupom ? 'Verificando...' : 'Aplicar'}
+                    </Button>
                   </div>
                 ) : (
-                  <div className="text-center">
-                    <p className="text-sm text-emerald-700 mb-1">Total da Venda</p>
-                    <p className="text-3xl font-bold text-emerald-900">
-                      {formatCurrency(calcularTotal())}
-                    </p>
+                  <div className="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200">
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-green-500 text-white">
+                        {cupomAplicado.tipo === 'desconto_percentual' 
+                          ? `-${cupomAplicado.valor}%` 
+                          : `-R$ ${cupomAplicado.valor}`}
+                      </Badge>
+                      <span className="text-sm font-medium text-green-700">{cupomAplicado.nome}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={removerCupom}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 )}
+                <p className="text-xs text-gray-500">Cupons: DESC10, DESC15, DESC20, PROMO5, PROMO10</p>
+              </div>
+
+              {/* Total */}
+              <div className="bg-gradient-to-r from-emerald-50 to-cyan-50 p-4 rounded-lg border border-emerald-200">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Subtotal:</span>
+                    <span>{formatCurrency(calcularSubtotal())}</span>
+                  </div>
+                  
+                  {descontoClube && descontoClube.tem_desconto && (
+                    <div className="flex justify-between text-sm text-green-600 font-medium">
+                      <span>Desconto Clube ({descontoClube.percentual_desconto}%):</span>
+                      <span>-{formatCurrency(calcularDescontoClube())}</span>
+                    </div>
+                  )}
+                  
+                  {cupomAplicado && (
+                    <div className="flex justify-between text-sm text-purple-600 font-medium">
+                      <span>Cupom ({cupomAplicado.tipo === 'desconto_percentual' ? `${cupomAplicado.valor}%` : `R$ ${cupomAplicado.valor}`}):</span>
+                      <span>-{formatCurrency(calcularDescontoCupom())}</span>
+                    </div>
+                  )}
+                  
+                  {(descontoClube?.tem_desconto || cupomAplicado) && (
+                    <div className="flex justify-between text-sm text-gray-500">
+                      <span>Desconto Total:</span>
+                      <span className="text-green-600 font-medium">-{formatCurrency(calcularDescontoTotal())}</span>
+                    </div>
+                  )}
+                  
+                  <div className="border-t border-emerald-200 pt-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-emerald-700 font-medium">Total Final:</span>
+                      <span className="text-2xl font-bold text-emerald-900">
+                        {formatCurrency(calcularTotal())}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Cliente */}
