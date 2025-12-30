@@ -338,9 +338,9 @@ const TransferenciaProdutos = ({ user }) => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-100 text-sm font-medium">Confirmadas</p>
+                <p className="text-green-100 text-sm font-medium">Recebidas</p>
                 <p className="text-2xl font-bold">
-                  {transferencias.filter(t => t.status === 'confirmada').length}
+                  {transferencias.filter(t => t.status === 'recebida').length}
                 </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-200" />
@@ -348,18 +348,16 @@ const TransferenciaProdutos = ({ user }) => {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-lg">
+        <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm font-medium">Este Mês</p>
+                <p className="text-orange-100 text-sm font-medium">Aguardando</p>
                 <p className="text-2xl font-bold">
-                  {transferencias.filter(t => 
-                    new Date(t.created_at).getMonth() === new Date().getMonth()
-                  ).length}
+                  {transferencias.filter(t => t.status === 'confirmada').length}
                 </p>
               </div>
-              <Building2 className="h-8 w-8 text-purple-200" />
+              <Package className="h-8 w-8 text-orange-200" />
             </div>
           </CardContent>
         </Card>
