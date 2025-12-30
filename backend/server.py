@@ -2106,7 +2106,7 @@ async def receber_transferencia(transferencia_id: str, current_user: UserBase = 
     # Atualizar status
     await db.transferencias.update_one(
         {"id": transferencia_id},
-        {"$set": {"status": "recebida"}}
+        {"$set": {"status": "recebida", "data_recebimento": datetime.now(timezone.utc).isoformat()}}
     )
     
     # Adicionar produto ao estoque da unidade destino
@@ -2114,10 +2114,13 @@ async def receber_transferencia(transferencia_id: str, current_user: UserBase = 
     if not produto_origem:
         raise HTTPException(status_code=404, detail="Produto origem não encontrado")
     
+    # Usar a unidade destino da transferência (não do usuário atual)
+    unidade_destino_id = transferencia["unidade_destino_id"]
+    
     # Verificar se produto já existe na unidade destino
     produto_destino = await db.produtos.find_one({
         "codigo_barras": produto_origem["codigo_barras"],
-        "unidade_id": current_user.unidade_id
+        "unidade_id": unidade_destino_id
     })
     
     if produto_destino:
@@ -2129,14 +2132,15 @@ async def receber_transferencia(transferencia_id: str, current_user: UserBase = 
     else:
         # Criar novo produto na unidade destino
         novo_produto = produto_origem.copy()
+        novo_produto.pop("_id", None)
         novo_produto["id"] = str(uuid.uuid4())
         novo_produto["quantidade"] = transferencia["quantidade"]
-        novo_produto["unidade_id"] = current_user.unidade_id
-        novo_produto["created_at"] = datetime.now(timezone.utc)
+        novo_produto["unidade_id"] = unidade_destino_id
+        novo_produto["created_at"] = datetime.now(timezone.utc).isoformat()
         
         await db.produtos.insert_one(novo_produto)
     
-    return {"message": "Transferência recebida com sucesso"}
+    return {"message": "Transferência recebida com sucesso! Produto adicionado ao estoque."}
 
 @api_router.get("/dashboard/unidades")
 async def get_dashboard_unidades(current_user: UserBase = Depends(get_current_user)):
