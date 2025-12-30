@@ -204,15 +204,67 @@ const PDV = ({ user }) => {
     return carrinho.reduce((total, item) => total + (item.preco * item.quantidade), 0);
   };
 
-  const calcularDesconto = () => {
+  const calcularDescontoClube = () => {
     if (descontoClube && descontoClube.tem_desconto) {
       return calcularSubtotal() * (descontoClube.percentual_desconto / 100);
     }
     return 0;
   };
 
+  const calcularDescontoCupom = () => {
+    if (cupomAplicado) {
+      const subtotalAposClube = calcularSubtotal() - calcularDescontoClube();
+      if (cupomAplicado.tipo === 'desconto_percentual') {
+        return subtotalAposClube * (cupomAplicado.valor / 100);
+      } else if (cupomAplicado.tipo === 'desconto_valor') {
+        return Math.min(cupomAplicado.valor, subtotalAposClube);
+      }
+    }
+    return 0;
+  };
+
+  const calcularDescontoTotal = () => {
+    return calcularDescontoClube() + calcularDescontoCupom();
+  };
+
   const calcularTotal = () => {
-    return calcularSubtotal() - calcularDesconto();
+    return calcularSubtotal() - calcularDescontoTotal();
+  };
+
+  const aplicarCupom = () => {
+    if (!codigoCupom.trim()) {
+      toast.error('Digite o código do cupom');
+      return;
+    }
+    
+    setAplicandoCupom(true);
+    
+    // Simular cupons válidos (em produção, verificar no backend)
+    const cuponsValidos = [
+      { codigo: 'DESC10', nome: 'Desconto 10%', tipo: 'desconto_percentual', valor: 10 },
+      { codigo: 'DESC15', nome: 'Desconto 15%', tipo: 'desconto_percentual', valor: 15 },
+      { codigo: 'DESC20', nome: 'Desconto 20%', tipo: 'desconto_percentual', valor: 20 },
+      { codigo: 'PROMO5', nome: 'Desconto R$ 5', tipo: 'desconto_valor', valor: 5 },
+      { codigo: 'PROMO10', nome: 'Desconto R$ 10', tipo: 'desconto_valor', valor: 10 },
+    ];
+    
+    setTimeout(() => {
+      const cupom = cuponsValidos.find(c => c.codigo.toUpperCase() === codigoCupom.toUpperCase());
+      
+      if (cupom) {
+        setCupomAplicado(cupom);
+        toast.success(`🎉 Cupom "${cupom.nome}" aplicado com sucesso!`);
+        setCodigoCupom('');
+      } else {
+        toast.error('Cupom inválido ou expirado');
+      }
+      setAplicandoCupom(false);
+    }, 500);
+  };
+
+  const removerCupom = () => {
+    setCupomAplicado(null);
+    toast.success('Cupom removido');
   };
 
   const calcularTroco = () => {
