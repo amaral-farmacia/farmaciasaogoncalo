@@ -293,8 +293,8 @@ const TransferenciaProdutos = ({ user }) => {
               <SelectContent>
                 <SelectItem value="todas">Todos os Status</SelectItem>
                 <SelectItem value="pendente">Pendente</SelectItem>
-                <SelectItem value="em_transito">Em Trânsito</SelectItem>
-                <SelectItem value="confirmada">Confirmada</SelectItem>
+                <SelectItem value="confirmada">Aguardando Recebimento</SelectItem>
+                <SelectItem value="recebida">Recebida</SelectItem>
                 <SelectItem value="cancelada">Cancelada</SelectItem>
               </SelectContent>
             </Select>
