@@ -304,20 +304,12 @@ async def init_db():
     admin_exists = await db.users.find_one({"username": "admin"})
     print(f"Admin user exists: {admin_exists is not None}")
     
-    # Verificar se usuário angical existe (para forçar reinicialização se necessário)
+    # Verificar se usuário angical existe
     angical_exists = await db.users.find_one({"username": "angical"})
     print(f"Angical user exists: {angical_exists is not None}")
     
-    # Limpar unidades duplicadas - manter apenas as 2 corretas
+    # Se admin existe, não reinicializar - apenas garantir que angical existe
     if admin_exists:
-        # Contar quantas unidades existem
-        unidades_count = await db.unidades.count_documents({})
-        print(f"Current units count: {unidades_count}")
-        
-        if unidades_count > 2:
-            print("🧹 Cleaning up duplicate units...")
-            # Manter apenas as unidades dos usuários admin e angical
-            admin_user = await db.users.find_one({"username": "admin"})
             angical_user = await db.users.find_one({"username": "angical"})
             
             valid_unit_ids = []
