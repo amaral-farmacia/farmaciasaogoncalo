@@ -310,54 +310,47 @@ async def init_db():
     
     # Se admin existe, não reinicializar - apenas garantir que angical existe
     if admin_exists:
-            angical_user = await db.users.find_one({"username": "angical"})
+        admin_user = await db.users.find_one({"username": "admin"})
+        print(f"✅ Sistema já inicializado. Admin unidade_id: {admin_user.get('unidade_id')}")
+        
+        # Apenas criar angical se não existir (sem deletar nada)
+        if not angical_exists:
+            # Verificar se já existe uma unidade Angical
+            angical_unit = await db.unidades.find_one({"nome": {"$regex": "Angical", "$options": "i"}})
             
-            valid_unit_ids = []
-            if admin_user:
-                valid_unit_ids.append(admin_user["unidade_id"])
-            if angical_user:
-                valid_unit_ids.append(angical_user["unidade_id"])
+            if angical_unit:
+                unidade_angical_id = angical_unit["id"]
+            else:
+                unidade_angical_id = str(uuid.uuid4())
+                angical_unit = {
+                    "id": unidade_angical_id,
+                    "nome": "Farmácia São Gonçalo Angical",
+                    "endereco": "Angical - BA",
+                    "telefone": "77999178367",
+                    "email": "amaralfarmacias@gmail.com",
+                    "cnpj": "12.345.678/0001-02",
+                    "responsavel": "Arquimedes Oliveira do Amaral",
+                    "ativa": True,
+                    "created_at": datetime.now(timezone.utc)
+                }
+                await db.unidades.insert_one(angical_unit)
             
-            # Deletar todas as outras unidades
-            result = await db.unidades.delete_many({"id": {"$nin": valid_unit_ids}})
-            print(f"Removed {result.deleted_count} duplicate units")
+            # Criar usuário angical
+            angical_user = {
+                "id": str(uuid.uuid4()),
+                "username": "angical",
+                "password_hash": hash_password("angical123"),
+                "full_name": "Colaborador Angical",
+                "role": "colaborador",
+                "unidade_id": unidade_angical_id,
+                "created_at": datetime.now(timezone.utc)
+            }
+            await db.users.insert_one(angical_user)
+            print("✅ Usuário Angical criado com sucesso")
+        
+        return  # Não continuar com inicialização completa
     
-    # If angical user doesn't exist, create it along with its unit
-    if not angical_exists:
-        # Create segunda unidade - São Gonçalo do Angical
-        unidade_angical_id = str(uuid.uuid4())
-        
-        # Create angical user
-        angical_user = {
-            "id": str(uuid.uuid4()),
-            "username": "angical",
-            "password_hash": hash_password("angical123"),
-            "full_name": "Colaborador Angical",
-            "role": "colaborador",
-            "unidade_id": unidade_angical_id,
-            "created_at": datetime.now(timezone.utc)
-        }
-        
-        await db.users.insert_one(angical_user)
-        
-        # Create angical unit
-        angical_unit = {
-            "id": unidade_angical_id,
-            "nome": "Farmácia São Gonçalo Angical",
-            "endereco": "Angical - BA",
-            "telefone": "77999178367",
-            "email": "amaralfarmacias@gmail.com",
-            "cnpj": "12.345.678/0001-02",
-            "responsavel": "Arquimedes Oliveira do Amaral",
-            "ativa": True,
-            "created_at": datetime.now(timezone.utc)
-        }
-        
-        await db.unidades.insert_one(angical_unit)
-        
-        print("✅ Angical user and unit created successfully")
-    
-    if not admin_exists:
+    # Se admin NÃO existe, fazer inicialização completa (primeira vez)
         # Create default unidade
         unidade_id = str(uuid.uuid4())
         
