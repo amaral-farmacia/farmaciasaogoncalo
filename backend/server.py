@@ -965,20 +965,21 @@ async def corrigir_datas_migracao(current_user: UserBase = Depends(get_current_u
     import random
     
     hoje = datetime.now(timezone.utc)
-    hoje_str = hoje.strftime("%Y-%m-%d")
     
-    # Buscar todas as vendas de hoje (que foram migradas) - usando regex para string
-    vendas_hoje = await db.vendas.find({
-        "unidade_id": current_user.unidade_id,
-        "created_at": {"$regex": f"^{hoje_str}"}
+    # Buscar todas as vendas (sem filtro de data)
+    todas_vendas = await db.vendas.find({
+        "unidade_id": current_user.unidade_id
     }).to_list(10000)
     
-    if len(vendas_hoje) < 10:
-        return {"message": "Poucas vendas para corrigir", "vendas_encontradas": len(vendas_hoje)}
+    # Filtrar vendas de 2026 (que são as migradas incorretamente)
+    vendas_para_corrigir = [v for v in todas_vendas if v.get('created_at', '').startswith('2026')]
+    
+    if len(vendas_para_corrigir) < 10:
+        return {"message": "Poucas vendas para corrigir", "vendas_encontradas": len(vendas_para_corrigir)}
     
     # Distribuir vendas ao longo dos últimos 90 dias
     atualizadas = 0
-    for i, venda in enumerate(vendas_hoje):
+    for i, venda in enumerate(vendas_para_corrigir):
         # Distribuir uniformemente nos últimos 90 dias
         dias_atras = random.randint(1, 90)
         horas = random.randint(8, 20)
