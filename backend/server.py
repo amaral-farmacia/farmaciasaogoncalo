@@ -829,6 +829,57 @@ async def buscar_produto_por_codigo(codigo: str, current_user: UserBase = Depend
         raise HTTPException(status_code=404, detail="Produto não encontrado")
     return Produto(**produto)
 
+@api_router.post("/produtos/importar-lote")
+async def importar_produtos_lote(produtos: list, current_user: UserBase = Depends(get_current_user)):
+    """Importa produtos em lote (apenas admin)"""
+    if current_user.role != 'admin':
+        raise HTTPException(status_code=403, detail="Apenas administradores podem importar produtos")
+    
+    importados = 0
+    erros = 0
+    duplicados = 0
+    
+    for produto_data in produtos:
+        try:
+            # Verificar se já existe pelo código de barras
+            codigo_barras = produto_data.get('codigo_barras', '')
+            if codigo_barras:
+                existe = await db.produtos.find_one({
+                    "codigo_barras": codigo_barras,
+                    "unidade_id": current_user.unidade_id
+                })
+                if existe:
+                    duplicados += 1
+                    continue
+            
+            # Criar novo produto
+            novo_produto = {
+                "id": str(uuid.uuid4()),
+                "nome": produto_data.get("nome", ""),
+                "codigo_barras": codigo_barras,
+                "preco": float(produto_data.get("preco", 0)),
+                "preco_custo": float(produto_data.get("preco_custo", 0)),
+                "quantidade": int(produto_data.get("quantidade", 0)),
+                "quantidade_minima": int(produto_data.get("quantidade_minima", 5)),
+                "localizacao": produto_data.get("localizacao", ""),
+                "data_validade": produto_data.get("data_validade", ""),
+                "unidade_id": current_user.unidade_id,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.produtos.insert_one(novo_produto)
+            importados += 1
+            
+        except Exception as e:
+            erros += 1
+    
+    return {
+        "importados": importados,
+        "duplicados": duplicados,
+        "erros": erros,
+        "total_processados": len(produtos)
+    }
+
 # Clients routes
 @api_router.get("/clientes", response_model=List[Cliente])
 async def get_clientes(current_user: UserBase = Depends(get_current_user)):
