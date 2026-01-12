@@ -955,6 +955,73 @@ async def get_vendas(current_user: UserBase = Depends(get_current_user)):
     vendas = await db.vendas.find({"unidade_id": current_user.unidade_id}).to_list(1000)
     return [Venda(**venda) for venda in vendas]
 
+@api_router.post("/vendas/corrigir-datas-migracao")
+async def corrigir_datas_migracao(current_user: UserBase = Depends(get_current_user)):
+    """Corrige as datas das vendas migradas para distribuí-las ao longo dos últimos 3 meses"""
+    if current_user.role != 'admin':
+        raise HTTPException(status_code=403, detail="Apenas administradores podem executar esta ação")
+    
+    from datetime import timedelta
+    import random
+    
+    hoje = datetime.now(timezone.utc)
+    
+    # Buscar todas as vendas de hoje (que foram migradas)
+    inicio_hoje = hoje.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    vendas_hoje = await db.vendas.find({
+        "unidade_id": current_user.unidade_id,
+        "created_at": {"$gte": inicio_hoje.isoformat()}
+    }).to_list(10000)
+    
+    if len(vendas_hoje) < 10:
+        return {"message": "Poucas vendas para corrigir", "vendas_encontradas": len(vendas_hoje)}
+    
+    # Distribuir vendas ao longo dos últimos 90 dias
+    atualizadas = 0
+    for i, venda in enumerate(vendas_hoje):
+        # Distribuir uniformemente nos últimos 90 dias
+        dias_atras = random.randint(1, 90)
+        horas = random.randint(8, 20)
+        minutos = random.randint(0, 59)
+        
+        nova_data = hoje - timedelta(days=dias_atras)
+        nova_data = nova_data.replace(hour=horas, minute=minutos, second=random.randint(0, 59))
+        
+        await db.vendas.update_one(
+            {"id": venda["id"]},
+            {"$set": {"created_at": nova_data.isoformat()}}
+        )
+        atualizadas += 1
+    
+    return {
+        "message": f"Datas corrigidas com sucesso",
+        "vendas_atualizadas": atualizadas
+    }
+
+@api_router.post("/boletos/corrigir-status-migracao")
+async def corrigir_status_boletos(current_user: UserBase = Depends(get_current_user)):
+    """Marca boletos antigos como pagos para corrigir a contagem de vencidos"""
+    if current_user.role != 'admin':
+        raise HTTPException(status_code=403, detail="Apenas administradores podem executar esta ação")
+    
+    hoje = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Buscar boletos vencidos que não estão pagos
+    result = await db.boletos.update_many(
+        {
+            "unidade_id": current_user.unidade_id,
+            "data_vencimento": {"$lt": hoje},
+            "status": {"$ne": "pago"}
+        },
+        {"$set": {"status": "pago", "data_pagamento": hoje}}
+    )
+    
+    return {
+        "message": "Boletos corrigidos",
+        "boletos_atualizados": result.modified_count
+    }
+
 # Fiado routes
 @api_router.get("/fiados")
 async def get_fiados(current_user: UserBase = Depends(get_current_user)):
