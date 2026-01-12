@@ -964,40 +964,42 @@ async def corrigir_datas_migracao(current_user: UserBase = Depends(get_current_u
     from datetime import timedelta
     import random
     
-    hoje = datetime.now(timezone.utc)
-    
-    # Buscar todas as vendas (sem filtro de data)
-    todas_vendas = await db.vendas.find({
-        "unidade_id": current_user.unidade_id
-    }).to_list(10000)
-    
-    # Filtrar vendas de 2026 (que são as migradas incorretamente)
-    vendas_para_corrigir = [v for v in todas_vendas if v.get('created_at', '').startswith('2026')]
-    
-    if len(vendas_para_corrigir) < 10:
-        return {"message": "Poucas vendas para corrigir", "vendas_encontradas": len(vendas_para_corrigir)}
-    
-    # Distribuir vendas ao longo dos últimos 90 dias
-    atualizadas = 0
-    for i, venda in enumerate(vendas_para_corrigir):
-        # Distribuir uniformemente nos últimos 90 dias
-        dias_atras = random.randint(1, 90)
-        horas = random.randint(8, 20)
-        minutos = random.randint(0, 59)
+    try:
+        hoje = datetime.now(timezone.utc)
         
-        nova_data = hoje - timedelta(days=dias_atras)
-        nova_data = nova_data.replace(hour=horas, minute=minutos, second=random.randint(0, 59))
+        # Buscar vendas com data em 2026 (migradas incorretamente)
+        todas_vendas = await db.vendas.find({
+            "unidade_id": current_user.unidade_id
+        }, {"_id": 0, "id": 1, "created_at": 1}).to_list(10000)
         
-        await db.vendas.update_one(
-            {"id": venda["id"]},
-            {"$set": {"created_at": nova_data.isoformat()}}
-        )
-        atualizadas += 1
-    
-    return {
-        "message": f"Datas corrigidas com sucesso",
-        "vendas_atualizadas": atualizadas
-    }
+        # Filtrar vendas de 2026
+        vendas_para_corrigir = [v for v in todas_vendas if str(v.get('created_at', '')).startswith('2026')]
+        
+        if len(vendas_para_corrigir) == 0:
+            return {"message": "Nenhuma venda para corrigir", "vendas_encontradas": 0}
+        
+        # Distribuir vendas ao longo dos últimos 90 dias
+        atualizadas = 0
+        for venda in vendas_para_corrigir:
+            dias_atras = random.randint(1, 90)
+            horas = random.randint(8, 20)
+            minutos = random.randint(0, 59)
+            
+            nova_data = hoje - timedelta(days=dias_atras)
+            nova_data = nova_data.replace(hour=horas, minute=minutos, second=random.randint(0, 59))
+            
+            await db.vendas.update_one(
+                {"id": venda["id"]},
+                {"$set": {"created_at": nova_data.isoformat()}}
+            )
+            atualizadas += 1
+        
+        return {
+            "message": "Datas corrigidas com sucesso",
+            "vendas_atualizadas": atualizadas
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/boletos/corrigir-status-migracao")
 async def corrigir_status_boletos(current_user: UserBase = Depends(get_current_user)):
