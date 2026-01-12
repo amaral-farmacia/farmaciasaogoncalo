@@ -965,13 +965,12 @@ async def corrigir_datas_migracao(current_user: UserBase = Depends(get_current_u
     import random
     
     hoje = datetime.now(timezone.utc)
+    hoje_str = hoje.strftime("%Y-%m-%d")
     
-    # Buscar todas as vendas de hoje (que foram migradas)
-    inicio_hoje = hoje.replace(hour=0, minute=0, second=0, microsecond=0)
-    
+    # Buscar todas as vendas de hoje (que foram migradas) - usando regex para string
     vendas_hoje = await db.vendas.find({
         "unidade_id": current_user.unidade_id,
-        "created_at": {"$gte": inicio_hoje.isoformat()}
+        "created_at": {"$regex": f"^{hoje_str}"}
     }).to_list(10000)
     
     if len(vendas_hoje) < 10:
