@@ -34,19 +34,17 @@ const Sidebar = ({ user, onLogout }) => {
     { path: "/entrada-mercadorias", icon: PackagePlus, label: "Entrada de Mercadorias" },
     { path: "/transferencias", icon: ArrowRightLeft, label: "Transferências" },
     { path: "/clientes", icon: Users, label: "Clientes" },
-    { path: "/promocoes", icon: Percent, label: "Promoções" },
-    ...(user.role === 'admin' ? [
-      { path: "/relatorios", icon: BarChart3, label: "Relatórios" },
-      { path: "/dashboard-unidades", icon: Building2, label: "Dashboard Unidades" }
-    ] : []),
-    { path: "/relatorio-lucro", icon: TrendingUp, label: "Relatório de Lucro" },
-    { path: "/boletos", icon: Receipt, label: "Boletos" },
+    { path: "/notas-fiscais", icon: FileText, label: "NFe" },
+    { path: "/fiados-vencidos", icon: AlertTriangle, label: "Fiados Vencidos" },
     { path: "/fechamento", icon: Calculator, label: "Fechamento" },
     ...(user.role === 'admin' ? [
+      { path: "/promocoes", icon: Percent, label: "Promoções" },
+      { path: "/boletos", icon: Receipt, label: "Boletos" },
+      { path: "/relatorios", icon: BarChart3, label: "Relatórios" },
+      { path: "/dashboard-unidades", icon: Building2, label: "Dashboard Unidades" },
+      { path: "/relatorio-lucro", icon: TrendingUp, label: "Relatório de Lucro" },
       { path: "/dre", icon: ClipboardList, label: "DRE" },
-      { path: "/fiados-vencidos", icon: AlertTriangle, label: "Fiados Vencidos" },
-      { path: "/usuarios", icon: User, label: "Usuários" },
-      { path: "/notas-fiscais", icon: FileText, label: "NFe" }
+      { path: "/usuarios", icon: User, label: "Usuários" }
     ] : [])
   ];
 
